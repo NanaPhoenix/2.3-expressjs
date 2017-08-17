@@ -22,11 +22,11 @@ app.all('/sub/*', function(req, res) {
 });
 
 app.post('/post', function(req, res) {
-  if (req.body && Object.keys(req.body).length > 0) {
+  if (req.body && Object.key(req.body).length > 0) {
     console.log();
     res.status(200).json(req.body);
   } else {
-    res.status(404).send('404 Not Found');
+    res.status(401).send('401 Authorization Required');
   }
 });
 
