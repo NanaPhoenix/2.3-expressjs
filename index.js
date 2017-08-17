@@ -1,28 +1,44 @@
-import http from 'http';
-import socketIO from 'socket.io';
-import app from './express';
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
 
-import connectionHandler from './socket';
-import config from '../configs/server.config.js';
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({"extended": true}));
 
-const server = http.createServer(app);
-const io = socketIO(server, {
-    path: `${config.rootDirectory || ''}/socket`
-});
-let currentApp = app;
-
-io.on('connection', connectionHandler);
-server.on('listening', () => {
-    // eslint-disable-next-line no-console
-    console.log('> Ready on http://localhost:3000!!');
+app.get('/', function(req, res) {
+  res.status(200).send('Hello, Express.js');
 });
 
-server.listen(3000);
+app.get('/hello', function(req, res) {
+  res.status(200).send('Hello stranger!');
+});
 
-if (module.hot) {
-    module.hot.accept('./express', () => {
-        server.removeListener('request', currentApp);
-        server.on('request', app);
-        currentApp = app;
-    });
-}
+app.get('/hello/:name', function(req, res) {
+  res.status(200).send(`Hello, ${req.params.name}!`);
+});
+
+app.all('/sub/*', function(req, res) {
+  res.send(`You requested URI: ${req.originalUrl}`);
+});
+
+app.post('/post', function(req, res) {
+  if (req.body && Object.keys(req.body).length > 0) {
+    console.log();
+    res.status(200).json(req.body);
+  } else {
+    res.status(404).send('404 Not Found');
+  }
+});
+
+app.all('*', (req, res) => {
+  res.send('Invalid format');
+});
+
+app.use(function(err, req, res, next) {
+  console.log(err.stack);
+  res.status(500).send({error: 'Something failed! Please try again'});
+});
+
+app.listen(3000, () => {
+  console.log('Server start... Waiting for connections.');
+});
