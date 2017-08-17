@@ -25,9 +25,9 @@ app.post('/post', function(req, res) {
   if (req.body && Object.key(req.body).length > 0) {
     console.log();
     res.status(200).json(req.body);
-  } else {
-    res.status(401).send('401 Authorization Required');
+    return;
   }
+  res.status(401).send('401 Authorization Required');
 });
 
 app.all('*', (req, res) => {
